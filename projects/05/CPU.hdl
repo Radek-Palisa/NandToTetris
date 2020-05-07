@@ -39,5 +39,51 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    And(a=instruction[3], b=instruction[15], out=writeM);
+
+    Mux16(a=instruction, b=outALU, sel=instruction[15], out=inA);
+
+    // A register
+    // load A if d1 or opcode A
+    Not(in=instruction[15], out=isinAstruction);
+    Or(a=instruction[5], b=isAinstruction, out=loadA);
+    ARegister(in=Ain, load=loadA, out=Aout, out[0..14]=addressM);
+
+    // D register
+    // load D if d2 and opcode C
+    And(a=instruction[4], b=instruction[15], out=loadD);
+    DRegister(in=outALU, load=loadD, out=Dout);
+
+    Mux16(a=Aout, b=inM, sel=instruction[12], out=inAlu);
+
+    ALU(
+        x=Dout, 
+        y=inAlu, 
+        zx=instruction[11], 
+        nx=instruction[10],
+        zy=instruction[9], 
+        ny=instruction[8], 
+        f=instruction[7], 
+        no=instruction[6], 
+        out=outALU, 
+        out=outM,
+        zr=zrALU, 
+        ng=ngALU
+    );
+
+    // ALU output positive
+    Not(in=zrALU, out=notzrALU);
+    Not(in=ngALU, out=notngALU);
+    And(a=notzrALU, b=notngALU, out=posALU);
+
+    // Jump
+    And(a=instruction[0], b=posALU, out=jumpIfPos);
+    And(a=instruction[1], b=zrALU, out=jumpIfZr);
+    And(a=instruction[2], b=ngALU, out=jumpIfNg);
+    Or(a=jumpIfPos, b=jumpIfZr, out=jumpIfPosOrZr);
+    Or(a=jumpIfPosOrZr, b=jumpIfNg, out=shouldJump);
+    // jump only if C instruction
+    And(a=shouldJump, b=instruction[15], out=loadPC);
+
+    PC(in=Aout, load=loadPC, inc=true, reset=reset, out[0..14]=pc);
 }
