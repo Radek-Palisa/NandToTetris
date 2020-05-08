@@ -45,9 +45,9 @@ CHIP CPU {
 
     // A register
     // load A if d1 or opcode A
-    Not(in=instruction[15], out=isinAstruction);
+    Not(in=instruction[15], out=isAinstruction);
     Or(a=instruction[5], b=isAinstruction, out=loadA);
-    ARegister(in=Ain, load=loadA, out=Aout, out[0..14]=addressM);
+    ARegister(in=inA, load=loadA, out=Aout, out[0..14]=addressM);
 
     // D register
     // load D if d2 and opcode C
