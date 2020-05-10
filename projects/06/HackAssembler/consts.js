@@ -61,7 +61,7 @@ const rSymbols = Array.from({ length: 16 }).reduce((acc, val, i) => {
 exports.symbolTableDict = {
   "SP"     : 0,
   "LCL"    : 1,
-  "ARG"    : 1,
+  "ARG"    : 2,
   "THIS"   : 3,
   "THAT"   : 4,  
   "SCREEN" : 16384,
